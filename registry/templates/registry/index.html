@@ -1,0 +1,72 @@
+{% load static %}
+<header>
+	<h1>Connection Status: {{ connection_info }}</h1>
+	<h1>Connection Chain: {{ chain_id }}</h1>
+</header>
+
+<link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+<script type="text/javascript">
+ $(document).ready(function(event) {
+	   $(".version").hide();
+	   $(document).ajaxStart(function(){
+		     $("#wait").css("display", "block");
+	   });
+	   $(document).ajaxComplete(function(){
+		     $("#wait").css("display", "none");
+	   });
+       $(".package_name").on('click', function(){
+		   var package_name = $(this).val();
+		   if ($(".version#"+package_name).is(":visible")){
+				$(".version#"+package_name).hide();
+		   } else {
+
+				$.ajax({
+					 type:"POST",
+					 url:"/get_package_data/",
+					 data: {
+							'csrfmiddlewaretoken': '{{ csrf_token }}',
+							'registry_address': '{{ active_registry.address }}',
+							'package_name': package_name,
+							},
+					 success: function(data) {
+						 $(".version#"+package_name).html(data);
+						 $(".version#"+package_name).show();
+					 },
+					 error: function(req, err){ console.log('my message' + err); }
+				});
+				return false;
+			}
+       });
+
+ }); 
+</script>
+
+<form action="/" method="post">
+	{% csrf_token %}
+    <label for="registry_addr">Registry Address: </label>
+    <input id="registry_addr" type="text" name="registry_addr" value="{{ registry_address }}">
+    <input type="submit" value="OK">
+</form>
+<h1> Registry @ {{ active_registry.address }} </h1>
+<h1> registry owner: {{ active_registry.owner }} </h1>
+<h1> package count: {{ active_registry.package_count }} </h1>
+<div id="wait" style="display:none;width:69px;height:89px;background:black;color:white;border:1px solid black;position:absolute;top:50%;left:50%;padding:2px;">doing things</div>
+<div class="packages">
+	{% if active_registry %}
+		{% for pkg in active_registry.packages %}
+		{% csrf_token %}
+		<h2 class="name" id="{{pkg.name}}">
+			package name: {{ pkg.name }} // release count: {{pkg.release_count}}
+			<input class="package_name" type="button" value='{{pkg.name}}'>
+		</h2>
+		<h2 class="version" id="{{pkg.name}}">
+			This is version data:
+		</h2>
+		{% endfor %}
+	{% else %}
+		<h3> please enter a valid registry address </h3>	
+	{% endif %}
+</div>
