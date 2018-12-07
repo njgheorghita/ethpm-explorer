@@ -1,11 +1,9 @@
 {% load static %}
-<header>
-	<h1>Connection Status: {{ connection_info }}</h1>
-	<h1>Connection Chain: {{ chain_id }}</h1>
-</header>
-
 <link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<!-- jQuery Modal -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
 <script type="text/javascript">
@@ -17,18 +15,18 @@
 	   $(document).ajaxComplete(function(){
 		     $("#wait").css("display", "none");
 	   });
-       $(".package_name").on('click', function(){
-		   var package_name = $(this).val();
+	   $(".package_name").on('click', function(event){
+		   var package_name = event.target.id;
 		   if ($(".version#"+package_name).is(":visible")){
 				$(".version#"+package_name).hide();
 		   } else {
-
 				$.ajax({
 					 type:"POST",
 					 url:"/get_package_data/",
 					 data: {
 							'csrfmiddlewaretoken': '{{ csrf_token }}',
 							'registry_address': '{{ active_registry.address }}',
+							'chain_id': '{{ chain_id }}',
 							'package_name': package_name,
 							},
 					 success: function(data) {
@@ -40,33 +38,107 @@
 				return false;
 			}
        });
-
  }); 
 </script>
+<header>
+	<div id="connection_info">
+		<form action="" method="post">
+			{% csrf_token %}
+			<select name="chain_id" id="chain_id">
+			  <option value="1">mainnet</option>
+			  <option value="3">ropsten</option>
+			  <option value="4">rinkeby</option>
+			  <option value="42">kovan</option>
+			</select>
+			<input type="submit" value="switch chain">
+		</form>
+		<div class='chain_selector'>
+			{% if connection_info %}
+				<h2>connected chain: <span style="color:green;">{{ chain_name }}</span></h2>
+			{% else %}
+				<h2>connected chain: <span style="color:red;">{{ chain_name }}</span></h2>
+			{% endif %}
+		</div>
+	</div>
+	<h1>
+		EthPM Registry Explorer
+	</h1>
+	<!-- Modal HTML embedded directly into document -->
+	<div id="ex1" class="modal">
+		<p> Welcome to the EthPM registry explorer!!! </p>
+		<p> This tool is provided to help you explore the package registries scattered throughout the blockchain jungle.</p>
+		<p> But, be careful, you CANNOT trust every package you see. </p>
+		<p> For your own safety and the safety of your code/eth. . . </p>
+		<p> PLEASE, PLEASE, PLEASE </p>
+		<p> Do NOT install or use an available package without trusting the registry's owner, or examining the source code yourself.</p>
+		<p> Happy Exploring!!!</p>
+	</div>
+	<!-- Link to open the modal -->
+	<div id="warning_modal">
+		<h3>
+			<span style='color:red;'>!!!!!!!!!!!!!!!!!!!!!!!!</span>
+				<br>
+			<a href="#ex1" rel="modal:open">
+				VERY IMPORTANT PLZ
+				<br>
+				READ BEFORE USE
+				<br>
+			</a>
+			<span style='color:red;'>!!!!!!!!!!!!!!!!!!!!!!!!</span>
+		</h3>
+	</div>
+</header>
 
-<form action="/" method="post">
-	{% csrf_token %}
-    <label for="registry_addr">Registry Address: </label>
-    <input id="registry_addr" type="text" name="registry_addr" value="{{ registry_address }}">
-    <input type="submit" value="OK">
-</form>
-<h1> Registry @ {{ active_registry.address }} </h1>
-<h1> registry owner: {{ active_registry.owner }} </h1>
-<h1> package count: {{ active_registry.package_count }} </h1>
+
+<h3>
+	<form action="/" method="post">
+		{% csrf_token %}
+		<label for="registry_addr">registry address: </label>
+		<input id="registry_addr" style="width:300px;border-radius:5px;" type="text" name="registry_addr" value="{{ registry_address }}">
+		<input name="chain_id" value="{{chain_id}}" type="hidden">
+		<input type="submit" value="OK">
+	</form>
+</h3>
+{% if active_registry %}
+	<h3> current registry: <a href="{{ active_registry.registry_link }}" class="address" target="_blank">{{ active_registry.address }}</a></h3>
+	<h3>
+		registry owner: 
+		{% if active_registry.owner_link %}
+		<a href="{{ active_registry.owner_link }}" target="_blank" class="address">
+			{{ active_registry.owner }}
+		</a>
+		{% else %}
+			<a class="address"> {{ active_registry.owner }} </a>
+		{% endif %}
+	</h3>
+	{% if active_registry.owner_link %}
+		<h3> package count: {{ active_registry.package_count }} </h3>
+	{% endif %}
+{% else %}
+	<h3> please enter a valid registry address </h3>	
+{% endif %}
 <div id="wait" style="display:none;width:69px;height:89px;background:black;color:white;border:1px solid black;position:absolute;top:50%;left:50%;padding:2px;">doing things</div>
 <div class="packages">
 	{% if active_registry %}
 		{% for pkg in active_registry.packages %}
 		{% csrf_token %}
-		<h2 class="name" id="{{pkg.name}}">
-			package name: {{ pkg.name }} // release count: {{pkg.release_count}}
-			<input class="package_name" type="button" value='{{pkg.name}}'>
+		<h2 class="package_name" id="{{pkg.name}}">
+			<span>{{ pkg.name }}</span>
+			<span style="float: right;">{{pkg.release_count}} release(s)</span>
 		</h2>
 		<h2 class="version" id="{{pkg.name}}">
 			This is version data:
 		</h2>
 		{% endfor %}
-	{% else %}
-		<h3> please enter a valid registry address </h3>	
 	{% endif %}
+</div>
+
+<div id="container">
+	<h3>
+		open-source: contribute @ github link
+	</h3>
+	<h3>
+	built with <3 using <a href="http://python.ethereum.org" target="_blank">py-ethereum tools</a>
+	</h3>
+	<img src="{% static 'registry/images/snek.png' %}" class="snek snek2"/>
 </div>
