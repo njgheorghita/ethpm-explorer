@@ -1,0 +1,129 @@
+{% load static %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(event) {
+// todo fancy stuff
+	$(".source_contract").hide();
+	$(".info").on('click', function(event){
+		var id_name = event.target.id;
+		console.log("xxx")
+		console.log(id_name)
+		if ($(".source_contract#"+id_name).is(":visible")){
+			$(".source_contract#"+id_name).hide();
+		} else {
+			$(".source_contract#"+id_name).show();
+		}
+	});
+});
+</script>
+<header>
+	<h1>
+		EthPM Registry Explorer
+	</h1>
+</header>
+<div class="meta">
+	{% if not manifest_data %}
+		<h3> Sorry, but we weren't able to find a valid manifest at {{manifest_uri}}</h3>
+		<h3> Please make sure your manifest conforms to the <a href="https://github.com/ethpm/ethpm-spec/blob/master/spec/package.spec.json" target="_blank">json schema</a></h3>
+	{% else %}
+	<h3>Manifest URI: <a href="{{hyperlink}}" target="_blank" style="float:right;font-size:1.25em;">{{manifest_uri}}</a></h3>
+	<h3>Package Name: <span style="float:right;">{{manifest_data.package_name}}</span></h3>
+	<h3>Version: <span style="float:right;">{{manifest_data.version}}</span></h3>
+	<h3>Manifest Version: <span style="float:right;">{{manifest_data.manifest_version}}</span></h3>
+	{% endif %}
+	<h4 style='color:red;'> Note: The appearance of data in this preview might not be 100% accurate due to formatting, please confirm that the data matches what is found in the raw manifest before relying on these packages for production use cases.</h4>
+</div>
+<div class="packages">
+	{% if manifest_data.authors %}
+		<h2 class="package_name">
+			authors
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#authors-authors" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.authors |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.description %}
+		<h2 class="package_name">
+			description
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#description-description" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.description |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.license %}
+		<h2 class="package_name">
+			license
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#license-license" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.license |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.keywords %}
+		<h2 class="package_name">
+			keywords
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#keywords-keywords" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.keywords |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.links %}
+		<h2 class="package_name hideable">
+			links
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#links-links" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.links |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.sources %}
+		<h2 class="package_name">
+			sources
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#sources-sources" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.sources |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.contract_types %}
+		<h2 class="package_name">
+			contract types
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#contract-types-contract-types" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.contract_types |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.deployments %}
+		<h2 class="package_name">
+			deployments
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#deployments-deployments" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.deployments |safe}}</h2>
+	{% endif %}
+	{% if manifest_data.build_dependencies %}
+		<h2 class="package_name">
+			build dependencies
+			<a href="http://ethpm.github.io/ethpm-spec/package-spec.html#build-dependencies-build-dependencies" target="_blank" style="float:right;font-size:1.2em;">
+				<i class="fas fa-info-circle" style="color:black;"></i>
+			</a>
+		</h2>
+		<h2 class="version"> {{manifest_data.build_dependencies |safe}}</h2>
+	{% endif %}
+</div>
+<div id="container">
+	<h3>
+		open-source: contribute @ github link
+	</h3>
+	<h3>
+	built with <3 using <a href="http://python.ethereum.org" target="_blank">py-ethereum tools</a>
+	</h3>
+	<img src="{% static 'registry/images/snek.png' %}" class="snek snek2"/>
+</div>
