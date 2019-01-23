@@ -52,17 +52,17 @@ def construct_html(releases_data):
 
 @to_tuple
 def generate_release_html(rls):
-    yield f"<h5 class='version_list'>version: <span style='font-weight:900;'>{rls.version}</span></h5>"
+    yield f"<h5 class='version_list'>Version: <span style='font-weight:900;'>{rls.version}</span></h5>"
     if rls.hyperlink:
         ipfs_hash = rls.hyperlink.split("/")[-1]
         yield f"""
-            <h5 class='version_list'>manifest uri: 
+            <h5 class='version_list'>Manifest URI: 
                 <span style='font-weight:900;'>{rls.manifest_uri}</span>
             </h5>
             <a href='manifest/{ipfs_hash}' target='_blank' style="font-size:1.3em;margin-top:-50px;float:right;">preview</a>
             """
     else:
-        yield f"<h5 class='version_list'>manifest uri: <span style='font-weight:900;'>{rls.manifest_uri}</span></h5>"
+        yield f"<h5 class='version_list'>Manifest URI: <span style='font-weight:900;'>{rls.manifest_uri}</span></h5>"
 
 
 def index(request):

@@ -1,7 +1,7 @@
 {% load static %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <!-- jQuery Modal -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
@@ -66,34 +66,34 @@
 	</h1>
 	<!-- Modal HTML embedded directly into document -->
 	<div id="ex1" class="modal">
-		<p> Hello there.</p>
-		<p> Welcome, to the EthPM Registry Explorer! </p>
-		<p> This tool is provided to help you explore the package registries scattered across the Ethereum blockchains.</p>
-		<p> But, be careful, you CANNOT trust every package you see. </p>
-		<p> Just because a package is available, does NOT guarantee that it's safe to install. </p>
-		<p> For the safety of your health and Eth. </p>
-		<p> PLEASE, PLEASE, PLEASE! </p>
-		<p> Do NOT install or use an available package without trusting the registry's owner, or independently verifying the package assets.</p>
-		<a href="#ex2" rel="modal:open" style="font-size:1.5em;font-weight:900;">NEXT</a>
+		<p style="font-size:1.2em;font-weight:900;"> Hello, there.</p>
+		<p> This tool was built to help you explore the wild & wonderful package registries scattered across Ethereum's blockchains. But, be careful . . . </p>
+		<p style="text-align:center;"><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i></p>
+		<p style="text-align:center;">You <span style="font-weight:900;">CANNOT</span> trust every package you see.</p>
+		<p style="text-align:center;"><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i></p>
+		<p> Just because a package is available, does <span style="font-weight:900;">NOT</span> guarantee that it is safe to use.</p>
+		<p style="font-size:1.2em;font-weight:900;">To safely use a package, you must . . .</p>
+		<p style="font-weight:900;">1. Independently verify the package's assets.</p>
+		<p>or </p>
+		<p style="font-weight:900;">2. Trust the registry's owner to publish safe packages.</p>
+		<br>
+		<a href="#ex2" rel="modal:open" style="font-size:1.3em;font-weight:900;">NEXT</a>
 	</div>
 	<div id="ex2" class="modal">
-		<p> If you don't know where to start, here are some reference registries to get you started. Check it out! </p>
+		<p> If you don't know where to start, here are some reference registries to get you started. </p>
 		<p style='font-weight:900;'><span style='font-size:1.3em;'> Mainnet @ </span> snakecharmers.eth </p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Ropsten @ </span> 0x6b5DA3cA4286Baa7fBaf64EEEE1834C7d430B729 </p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Rinkeby @ </span> 0xa67Bd074d885608D4c23EAA75a790E586924052e</p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Kovan @ </span> 0xc1f2f4d4b6E2A39D32351c8C4Dd4FB0B7AC72C17 </p>
-		<p> The above registries are maintained by Nick Gheorghita "nickg@ethereum.org" (0x9182902397B57a8c611D764D4DCD24BA951B4319). These packages have been carefully and lovingly crafted, but none of them have undergone a thorough audit, so use them at your own risk and proceed with caution. </p>
-		<p> If you are an auditor/consultancy in the space, and would like to have your registry listed here, please shoot me an email. </p>
-		<a href="#ex3" rel="modal:open" style="font-size:1.5em;font-weight:900;">NEXT</a>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Ropsten @ </span> 0x494f4AD0e876f5A1D45f429cd5B97EBc5ffAc525 </p>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Rinkeby @ </span> 0xFc18a975c4f199C2BC3a7FC105c57C78fa5A3B06</p>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Kovan @ </span> 0x10DcBa7e6fa109369a8ACf7612aBD135349f6c50 </p>
+		<p> These reference registries are maintained by Nick Gheorghita (0x9182902397B57a8c611D764D4DCD24BA951B4319). While their packages have been carefully and lovingly crafted, *none* of them have undergone a thorough audit, so use them at your own risk and proceed with caution. </p>
+		<a href="#ex3" rel="modal:open" style="font-size:1.3em;font-weight:900;">NEXT</a>
 	</div>
 	<div id="ex3" class="modal">
-		<h3> More Useful Resources </h3>
-		<p> <a href="" target="_blank"> Intro to EthPM Blog </a></p>
-		<p> <a href="" target="_blank"> How to use EthPM Blog </a></p>
-		<p>If you're interested in deploying your own registry (which you should be :wink: :wink:)</p>
-		<p>Check out this tutorial <a href="" target="_blank">empty link</a></p>
-		<p> pps. this explorer supports both the solidity and vyper implementations of [link] erc1319.</p>
-		<a href="#ex3" rel="modal:close" style="font-size:1.5em;font-weight:900;">CLOSE</a>
+		<h3> Useful Resources </h3>
+		<p style="font-size:1.5em;"> <a href="http://ethpm.github.io/ethpm-spec/" target="_blank">EthPM Specification</a> </p>
+		<p style="font-size:1.5em;"> <a href="https://gitter.im/ethpm/" target="_blank">Gitter Channel</a> </p>
+		<p style="font-size:1.5em;"> <a href="https://medium.com/coinmonks/ethpm-smart-contract-packages-for-developers-81c77481c491" target="_blank"> EthPM: Smart Contract Packages for Developers (Blog) </a></p>
+		<a href="#ex3" rel="modal:close" style="font-size:1.3em;font-weight:900;">CLOSE</a>
 	</div>
 	<!-- Link to open the modal -->
 	<div id="warning_modal">
@@ -115,7 +115,7 @@
 		<form action="/" method="post">
 			{% csrf_token %}
 			<label for="registry_addr">Registry Lookup: </label>
-			<input id="registry_addr" placeholder=" Address or ENS(mainnet only)" style="width:600px;font-size:1.1em;border-radius:5px;" type="text" name="registry_addr" value="{{ registry_address }}">
+			<input id="registry_addr" placeholder=" Address or ENS(mainnet only)" style="width:600px;font-size:1.05em;border-radius:5px;" type="text" name="registry_addr" value="{{ registry_address }}">
 			<input name="chain_id" value="{{chain_id}}" type="hidden">
 			<input type="submit" value="OK">
 		</form>
@@ -151,7 +151,7 @@
 	{% endif %}
 </div>
 <div class="packages">
-	<div id="wait" style="display:none;width:129px;height:100%;background:black;color:white;border:1px solid black;position:absolute;top:50%;left:45%;padding:2px;">fetching your data,<br>plz wait</div>
+	<div id="wait" style="display:none;width:179px;background:black;color:white;border-radius:3px;border:1px solid black;position:fixed;top:50%;left:45%;padding:2px;"><br>&nbspFetching your data,<br><br>&nbspplease stand by. . .<br>&nbsp</div>
 	{% if active_registry %}
 		{% for pkg in active_registry.packages %}
 		{% csrf_token %}
@@ -171,10 +171,10 @@
 
 <div id="container">
 	<h3>
-		Have questions? Found a bug? Join us in our <a href="https://gitter.im/ethpm/" target="_blank">Gitter room</a>
+		Have questions? Found a bug? Join us in our <a href="https://gitter.im/ethpm/" target="_blank" style="font-size:1em;">Gitter room</a>
 	</h3>
 	<h3>
-	Built with <3 using <a href="http://python.ethereum.org" target="_blank">snakecharmer tools</a>
+	Built with <3 using <a href="http://python.ethereum.org" target="_blank" style="font-size:1em;">snakecharmer tools</a>
 	</h3>
 	<img src="{% static 'registry/images/snek.png' %}" class="snek snek2"/>
 </div>

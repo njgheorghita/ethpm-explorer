@@ -1,7 +1,7 @@
 {% load static %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function(event) {
 // todo fancy stuff
@@ -33,7 +33,7 @@ $(document).ready(function(event) {
 	<h3>Version: <span style="float:right;">{{manifest_data.version}}</span></h3>
 	<h3>Manifest Version: <span style="float:right;">{{manifest_data.manifest_version}}</span></h3>
 	{% endif %}
-	<h4 style='color:red;'> Note: The appearance of data in this preview might not be 100% accurate due to formatting, please confirm that the data matches what is found in the raw manifest before relying on these packages for production use cases.</h4>
+	<h4 style='color:red;'> Note:<br> The appearance of data in this preview might not be 100% accurate due to formatting.<br> Please avoid copy & pasting from this manifest preview without confirming the data matches what is found in the source manifest.
 </div>
 <div class="packages">
 	{% if manifest_data.authors %}

@@ -1,3 +1,6 @@
 django==2.1.5
 web3==5.0.0-alpha.4
-
+psycopg2==2.7.1
+gunicorn==19.9.0
+django-configurations
+django-heroku
