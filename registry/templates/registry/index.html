@@ -1,4 +1,5 @@
 {% load static %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <!-- jQuery Modal -->
@@ -15,7 +16,7 @@
 	   $(document).ajaxComplete(function(){
 		     $("#wait").css("display", "none");
 	   });
-	   $(".package_name").on('click', function(event){
+	 $(".package_name").on('click', function(event){
 		   var package_name = event.target.id;
 		   if ($(".version#"+package_name).is(":visible")){
 				$(".version#"+package_name).hide();
@@ -54,7 +55,7 @@
 		</form>
 		<div class='chain_selector'>
 			{% if connection_info %}
-				<h2>connected chain: <span style="color:green;">{{ chain_name }}</span></h2>
+				<h2>connected chain: <span style="color:#5CB636;">{{ chain_name }}</span></h2>
 			{% else %}
 				<h2>connected chain: <span style="color:red;">{{ chain_name }}</span></h2>
 			{% endif %}
@@ -65,69 +66,104 @@
 	</h1>
 	<!-- Modal HTML embedded directly into document -->
 	<div id="ex1" class="modal">
-		<p> Welcome to the EthPM registry explorer!!! </p>
-		<p> This tool is provided to help you explore the package registries scattered throughout the blockchain jungle.</p>
+		<p> Hello there.</p>
+		<p> Welcome, to the EthPM Registry Explorer! </p>
+		<p> This tool is provided to help you explore the package registries scattered across the Ethereum blockchains.</p>
 		<p> But, be careful, you CANNOT trust every package you see. </p>
-		<p> For your own safety and the safety of your code/eth. . . </p>
-		<p> PLEASE, PLEASE, PLEASE </p>
-		<p> Do NOT install or use an available package without trusting the registry's owner, or examining the source code yourself.</p>
-		<p> Happy Exploring!!!</p>
+		<p> Just because a package is available, does NOT guarantee that it's safe to install. </p>
+		<p> For the safety of your health and Eth. </p>
+		<p> PLEASE, PLEASE, PLEASE! </p>
+		<p> Do NOT install or use an available package without trusting the registry's owner, or independently verifying the package assets.</p>
+		<a href="#ex2" rel="modal:open" style="font-size:1.5em;font-weight:900;">NEXT</a>
+	</div>
+	<div id="ex2" class="modal">
+		<p> If you don't know where to start, here are some reference registries to get you started. Check it out! </p>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Mainnet @ </span> snakecharmers.eth </p>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Ropsten @ </span> 0x6b5DA3cA4286Baa7fBaf64EEEE1834C7d430B729 </p>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Rinkeby @ </span> 0xa67Bd074d885608D4c23EAA75a790E586924052e</p>
+		<p style='font-weight:900;'><span style='font-size:1.3em;'> Kovan @ </span> 0xc1f2f4d4b6E2A39D32351c8C4Dd4FB0B7AC72C17 </p>
+		<p> The above registries are maintained by Nick Gheorghita "nickg@ethereum.org" (0x9182902397B57a8c611D764D4DCD24BA951B4319). These packages have been carefully and lovingly crafted, but none of them have undergone a thorough audit, so use them at your own risk and proceed with caution. </p>
+		<p> If you are an auditor/consultancy in the space, and would like to have your registry listed here, please shoot me an email. </p>
+		<a href="#ex3" rel="modal:open" style="font-size:1.5em;font-weight:900;">NEXT</a>
+	</div>
+	<div id="ex3" class="modal">
+		<h3> More Useful Resources </h3>
+		<p> <a href="" target="_blank"> Intro to EthPM Blog </a></p>
+		<p> <a href="" target="_blank"> How to use EthPM Blog </a></p>
+		<p>If you're interested in deploying your own registry (which you should be :wink: :wink:)</p>
+		<p>Check out this tutorial <a href="" target="_blank">empty link</a></p>
+		<p> pps. this explorer supports both the solidity and vyper implementations of [link] erc1319.</p>
+		<a href="#ex3" rel="modal:close" style="font-size:1.5em;font-weight:900;">CLOSE</a>
 	</div>
 	<!-- Link to open the modal -->
 	<div id="warning_modal">
 		<h3>
-			<span style='color:red;'>!!!!!!!!!!!!!!!!!!!!!!!!</span>
-				<br>
 			<a href="#ex1" rel="modal:open">
-				VERY IMPORTANT PLZ
+				<i class="fas fa-exclamation-circle" style="font-size:2em;color:red;"></i>
+				<span style='color:red;font-size:2.5em;'>&nbspCAUTION&nbsp</span>
+				<i class="fas fa-exclamation-circle" style="font-size:2em;color:red;"></i>
 				<br>
-				READ BEFORE USE
-				<br>
+				<span style="font-size:1.2em;color:red;">Please read this before exploring</span>
 			</a>
-			<span style='color:red;'>!!!!!!!!!!!!!!!!!!!!!!!!</span>
 		</h3>
 	</div>
 </header>
 
 
-<h3>
-	<form action="/" method="post">
-		{% csrf_token %}
-		<label for="registry_addr">registry address: </label>
-		<input id="registry_addr" style="width:300px;border-radius:5px;" type="text" name="registry_addr" value="{{ registry_address }}">
-		<input name="chain_id" value="{{chain_id}}" type="hidden">
-		<input type="submit" value="OK">
-	</form>
-</h3>
-{% if active_registry %}
-	<h3> current registry: <a href="{{ active_registry.registry_link }}" class="address" target="_blank">{{ active_registry.address }}</a></h3>
-	<h3>
-		registry owner: 
-		{% if active_registry.owner_link %}
-		<a href="{{ active_registry.owner_link }}" target="_blank" class="address">
-			{{ active_registry.owner }}
-		</a>
-		{% else %}
-			<a class="address"> {{ active_registry.owner }} </a>
-		{% endif %}
+<div class="meta">
+	<h3 style='border-bottom:2px solid grey;'>
+		<form action="/" method="post">
+			{% csrf_token %}
+			<label for="registry_addr">Registry Lookup: </label>
+			<input id="registry_addr" placeholder=" Address or ENS(mainnet only)" style="width:600px;font-size:1.1em;border-radius:5px;" type="text" name="registry_addr" value="{{ registry_address }}">
+			<input name="chain_id" value="{{chain_id}}" type="hidden">
+			<input type="submit" value="OK">
+		</form>
 	</h3>
-	{% if active_registry.owner_link %}
-		<h3> package count: {{ active_registry.package_count }} </h3>
+	{% if active_registry %}
+		<h3> Current Registry: 
+			<span style="float:right;">
+				{% if active_registry.ens_domain %}
+					<span> {{active_registry.ens_domain}} @ </span>
+				{% endif %}
+				<a href="{{ active_registry.registry_link }}" class="address" target="_blank">
+					{{ active_registry.address }}
+				</a>
+			</span>
+		</h3>
+		<h3>
+			Registry Owner: 
+			{% if active_registry.owner_link %}
+			<span style="float:right;">
+				<a href="{{ active_registry.owner_link }}" target="_blank" class="address">
+					{{ active_registry.owner }}
+				</a>
+				{% else %}
+					<a class="address"> {{ active_registry.owner }} </a>
+				{% endif %}
+			</span>
+		</h3>
+		{% if active_registry.owner_link %}
+			<h3> Package Count: <span style="float:right;">{{ active_registry.package_count }}</span> </h3>
+		{% endif %}
+	{% else %}
+		<h3> Please enter a valid registry address. </h3>	
 	{% endif %}
-{% else %}
-	<h3> please enter a valid registry address </h3>	
-{% endif %}
-<div id="wait" style="display:none;width:69px;height:89px;background:black;color:white;border:1px solid black;position:absolute;top:50%;left:50%;padding:2px;">doing things</div>
+</div>
 <div class="packages">
+	<div id="wait" style="display:none;width:129px;height:100%;background:black;color:white;border:1px solid black;position:absolute;top:50%;left:45%;padding:2px;">fetching your data,<br>plz wait</div>
 	{% if active_registry %}
 		{% for pkg in active_registry.packages %}
 		{% csrf_token %}
-		<h2 class="package_name" id="{{pkg.name}}">
-			<span>{{ pkg.name }}</span>
-			<span style="float: right;">{{pkg.release_count}} release(s)</span>
+		<h2 class="package_name" id="{{pkg.name}}" style="cursor:pointer;">
+			{{ pkg.name }}
+			{% if pkg.release_count == 1 %}
+				<span style="float: right;">{{pkg.release_count}} release</span>
+			{% else %}
+				<span style="float: right;">{{pkg.release_count}} releases</span>
+			{% endif %}
 		</h2>
 		<h2 class="version" id="{{pkg.name}}">
-			This is version data:
 		</h2>
 		{% endfor %}
 	{% endif %}
@@ -135,10 +171,10 @@
 
 <div id="container">
 	<h3>
-		open-source: contribute @ github link
+		Have questions? Found a bug? Join us in our <a href="https://gitter.im/ethpm/" target="_blank">Gitter room</a>
 	</h3>
 	<h3>
-	built with <3 using <a href="http://python.ethereum.org" target="_blank">py-ethereum tools</a>
+	Built with <3 using <a href="http://python.ethereum.org" target="_blank">snakecharmer tools</a>
 	</h3>
 	<img src="{% static 'registry/images/snek.png' %}" class="snek snek2"/>
 </div>
