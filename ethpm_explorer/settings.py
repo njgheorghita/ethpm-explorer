@@ -27,6 +27,8 @@ SECRET_KEY = '5qw@-#i^6zkts(%(wq-b^sy8p32z3v=(_$z4z2lqiu88^jwp*!'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'registry.ethpm.com',
+    'ethpm.com',
     'sleepy-mountain-95783.herokuapp.com',
     'localhost',
 ]
