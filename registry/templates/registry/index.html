@@ -1,12 +1,6 @@
+{% extends "registry/base.html" %}
 {% load static %}
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-<link rel="stylesheet" type="text/css" href="{% static 'registry/style.css' %}" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<!-- jQuery Modal -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-
+{% block content %}
 <script type="text/javascript">
  $(document).ready(function(event) {
 	   $(".version").hide();
@@ -42,110 +36,104 @@
  }); 
 </script>
 <header>
-	<div id="connection_info">
-		<form action="" method="post">
+	<div id="connection_info" style="position:absolute;">
+		<form action="/" method="post" class="form-inline" style="margin-top:-15px;">
 			{% csrf_token %}
-			<select name="chain_id" id="chain_id">
+			<select name="chain_id" id="chain_id" class="form-control" >
 			  <option value="1">mainnet</option>
 			  <option value="3">ropsten</option>
 			  <option value="4">rinkeby</option>
 			  <option value="42">kovan</option>
 			</select>
-			<input type="submit" value="switch chain">
+			<input type="submit" value="Switch Chain" class="btn btn-secondary btn-sm" style="margin-left:10px;">
 		</form>
-		<div class='chain_selector'>
+		<div class='chain_selector' style="margin-top:-5px;font-size:1.1em;">
 			{% if connection_info %}
-				<h2>connected chain: <span style="color:#5CB636;">{{ chain_name }}</span></h2>
+				Connected to <span style="color:#5CB636;">{{ chain_name }}</span>
 			{% else %}
-				<h2>connected chain: <span style="color:red;">{{ chain_name }}</span></h2>
+				Connected to <span style="color:red;">{{ chain_name }}</span>
 			{% endif %}
 		</div>
 	</div>
-	<h1>
-		EthPM Registry Explorer
-	</h1>
-	<!-- Modal HTML embedded directly into document -->
-	<div id="ex1" class="modal">
-		<p style="font-size:1.2em;font-weight:900;"> Hello, there.</p>
-		<p> This tool was built to help you explore the wild & wonderful package registries scattered across Ethereum's blockchains. But, be careful . . . </p>
-		<p style="text-align:center;"><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i></p>
-		<p style="text-align:center;">You <span style="font-weight:900;">CANNOT</span> trust every package you see.</p>
-		<p style="text-align:center;"><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i><i class="fas fa-skull-crossbones"></i></p>
-		<p> Just because a package is available, does <span style="font-weight:900;">NOT</span> guarantee that it is safe to use.</p>
-		<p style="font-size:1.2em;font-weight:900;">To safely use a package, you must . . .</p>
-		<p style="font-weight:900;">1. Independently verify the package's assets.</p>
-		<p>or </p>
-		<p style="font-weight:900;">2. Trust the registry's owner to publish safe packages.</p>
-		<br>
-		<a href="#ex2" rel="modal:open" style="font-size:1.3em;font-weight:900;">NEXT</a>
+	<div class="h-100 row justify-content-center">
+		<a href="/" style="font-size:105%;text-decoration:none;"><h1>EthPM Registry Explorer</h1></a>
 	</div>
-	<div id="ex2" class="modal">
-		<p> If you don't know where to start, here are some reference registries to get you started. </p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Mainnet @ </span> snakecharmers.eth </p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Ropsten @ </span> 0x494f4AD0e876f5A1D45f429cd5B97EBc5ffAc525 </p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Rinkeby @ </span> 0xFc18a975c4f199C2BC3a7FC105c57C78fa5A3B06</p>
-		<p style='font-weight:900;'><span style='font-size:1.3em;'> Kovan @ </span> 0x10DcBa7e6fa109369a8ACf7612aBD135349f6c50 </p>
-		<p> These reference registries are maintained by Nick Gheorghita (0x9182902397B57a8c611D764D4DCD24BA951B4319). While their packages have been carefully and lovingly crafted, *none* of them have undergone a thorough audit, so use them at your own risk and proceed with caution. </p>
-		<a href="#ex3" rel="modal:open" style="font-size:1.3em;font-weight:900;">NEXT</a>
-	</div>
-	<div id="ex3" class="modal">
-		<h3> Useful Resources </h3>
-		<p style="font-size:1.5em;"> <a href="http://ethpm.github.io/ethpm-spec/" target="_blank">EthPM Specification</a> </p>
-		<p style="font-size:1.5em;"> <a href="https://gitter.im/ethpm/" target="_blank">Gitter Channel</a> </p>
-		<p style="font-size:1.5em;"> <a href="https://medium.com/coinmonks/ethpm-smart-contract-packages-for-developers-81c77481c491" target="_blank"> EthPM: Smart Contract Packages for Developers (Blog) </a></p>
-		<a href="#ex3" rel="modal:close" style="font-size:1.3em;font-weight:900;">CLOSE</a>
-	</div>
-	<!-- Link to open the modal -->
-	<div id="warning_modal">
-		<h3>
-			<a href="#ex1" rel="modal:open">
-				<i class="fas fa-exclamation-circle" style="font-size:2em;color:red;"></i>
-				<span style='color:red;font-size:2.5em;'>&nbspCAUTION&nbsp</span>
-				<i class="fas fa-exclamation-circle" style="font-size:2em;color:red;"></i>
-				<br>
-				<span style="font-size:1.2em;color:red;">Please read this before exploring</span>
-			</a>
-		</h3>
+	<div style="float:right;margin-top:-70px;margin-right:15px;">
+		<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+		  Click here before exploring!
+		</button>
 	</div>
 </header>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel" style='font-weight:900;'>The first rule of EthPM.</h1>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<h3> Only download packages from trusted registries. </h3>
+		<br>
+      	<p> This tool is provided to help you explore the wild &amp; wonderful package registries scattered across Ethereum's blockchains. But, be careful. Just because a package is available, does NOT guarantee the package is safe to use.
+		<br>
+		<h4>To safely use a package, you must either...</h4>
+		1. Trust the registry's owner to publish safe packages.
+		<br>
+		or
+		<br>
+		2. Independently verify the package's assets.
+		<br>
+		<br>
+		<h4 style='font-weight:900;'> Please, practice safe package management.</h4>
+		<br>
+		<p> Don't know where to start? Head over to the <a href="/directory">EthPM Directory</a>. </p>
+		<p> Check out <a href="https://www.ethpm.com/" target="_blank">ethpm.com</a> for more resources.</p>
+	</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="meta">
-	<h3 style='border-bottom:2px solid grey;'>
-		<form action="/" method="post">
+	<h3 style='border-bottom:2px solid grey;margin-top:25px;'>
+		<form action="/browse/{{chain_name}}/" method="post">
 			{% csrf_token %}
 			<label for="registry_addr">Registry Lookup: </label>
-			<input id="registry_addr" placeholder=" Address or ENS(mainnet only)" style="width:600px;font-size:1.05em;border-radius:5px;" type="text" name="registry_addr" value="{{ registry_address }}">
+			<input id="registry_addr" placeholder=" Address or ENS(mainnet only)" style="width:70%;font-size:1.05em;border-radius:5px;" type="text" name="registry_addr" value="{{ request.GET.registry_addr }}">
 			<input name="chain_id" value="{{chain_id}}" type="hidden">
-			<input type="submit" value="OK">
+			<input type="submit" class="btn btn-secondary" value="OK">
 		</form>
 	</h3>
 	{% if active_registry %}
-		<h3> Current Registry: 
-			<span style="float:right;">
-				{% if active_registry.ens_domain %}
-					<span> {{active_registry.ens_domain}} @ </span>
-				{% endif %}
-				<a href="{{ active_registry.registry_link }}" class="address" target="_blank">
-					{{ active_registry.address }}
-				</a>
-			</span>
-		</h3>
-		<h3>
-			Registry Owner: 
+	<dl class="row">
+		<dt class="col-sm-3">Current Registry</dt>
+		<dd class="col-sm-9">
+			{% if active_registry.ens_domain %}
+				<span> {{active_registry.ens_domain}} @ </span>
+			{% endif %}
+			<a href="{{ active_registry.registry_link }}" class="address" target="_blank">
+				{{ active_registry.address }}
+			</a>
+		</dd>
+		<dt class="col-sm-3">Registry Owner</dt>
+		<dd class="col-sm-9">
 			{% if active_registry.owner_link %}
-			<span style="float:right;">
 				<a href="{{ active_registry.owner_link }}" target="_blank" class="address">
 					{{ active_registry.owner }}
 				</a>
-				{% else %}
+			{% else %}
 					<a class="address"> {{ active_registry.owner }} </a>
-				{% endif %}
-			</span>
-		</h3>
-		{% if active_registry.owner_link %}
-			<h3> Package Count: <span style="float:right;">{{ active_registry.package_count }}</span> </h3>
-		{% endif %}
+			{% endif %}
+		</dd>
+		<dt class="col-sm-3">Package Count</dt>
+		<dd class="col-sm-9">{{ active_registry.package_count }}</dd>
+	</dl>
 	{% else %}
 		<h3> Please enter a valid registry address. </h3>	
 	{% endif %}
@@ -157,11 +145,7 @@
 		{% csrf_token %}
 		<h2 class="package_name" id="{{pkg.name}}" style="cursor:pointer;">
 			{{ pkg.name }}
-			{% if pkg.release_count == 1 %}
-				<span style="float: right;">{{pkg.release_count}} release</span>
-			{% else %}
-				<span style="float: right;">{{pkg.release_count}} releases</span>
-			{% endif %}
+			<span class="badge badge-primary badge-pill" style="float:right;background:black;color:white;">{{pkg.release_count}}</span>
 		</h2>
 		<h2 class="version" id="{{pkg.name}}">
 		</h2>
@@ -169,12 +153,4 @@
 	{% endif %}
 </div>
 
-<div id="container">
-	<h3>
-		Have questions? Found a bug? Join us in our <a href="https://gitter.im/ethpm/" target="_blank" style="font-size:1em;">Gitter room</a>
-	</h3>
-	<h3>
-	Built with <3 using <a href="http://python.ethereum.org" target="_blank" style="font-size:1em;">snakecharmer tools</a>
-	</h3>
-	<img src="{% static 'registry/images/snek.png' %}" class="snek snek2"/>
-</div>
+{% endblock %}

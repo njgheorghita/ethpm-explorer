@@ -2,7 +2,7 @@ from django.db import models
 from django.forms import ModelForm
 from typing import Any, Dict
 import json
-from eth_utils import to_tuple
+from eth_utils import to_tuple, to_dict
 
 from ethpm.constants import IPFS_GATEWAY_PREFIX
 from ethpm.utils.backend import resolve_uri_contents
@@ -186,8 +186,12 @@ class Manifest(models.Model):
 
 def deployments_to_table(deps):
     chain_data = [process_chain(dep) for dep in deps.items()]
-    dep_html = [f"<li>{html[0]}{html[1]}</li>" for html in chain_data]
+    dep_html = [f"<dl class='row'>{html[0]}{html[1]}</dl>" for html in chain_data]
     return "".join(dep_html)
+
+
+def escape_angles(string):
+    return string.replace(">", "&gt;").replace("<", "&lt;")
 
 
 @to_tuple
@@ -195,12 +199,18 @@ def process_chain(chain):
     chain_uri, deployments = chain
     chain_type = identify_blockchain_uri(chain_uri)
     if chain_type:
-        yield f"<h5><p style='font-size:1.5em;text-decoration:underline;'>{chain_type}</p><p>{chain_uri}</p></h5>"
+        yield f"<dd class='col-sm-12 text' style='font-size:1.5em;text-decoration:underline;'><span style='border-bottom:1px solid grey;'>{chain_type}<br><span style='font-size:0.4em;'>{chain_uri}</span></span></dd>"
     else:
-        yield f"<h5>{chain_uri}</h5>"
-    deps = [process_deployment(dep) for dep in deployments.items()]
-    deps_html = [f"<h4>{xx[0]}</h4><pre>{xx[1]}</pre>" for xx in deps]
-    yield "".join(deps_html)
+        yield f"<dd class='col-sm-12'>{chain_uri}</dd>"
+    deps = [process_deployment(dep, chain_type) for dep in deployments.items()]
+
+    deps_html_list = [
+        f"<dd class='col-sm-12'>{dep[0]}</dd><dd class='col-sm-12'><pre>{dep[1]}</pre></dd>"
+        for dep in deps
+    ]
+    deps_html_insert = "".join(deps_html_list)
+
+    yield f"{deps_html_insert}"
 
 
 def identify_blockchain_uri(uri):
@@ -211,16 +221,41 @@ def identify_blockchain_uri(uri):
     return None
 
 
+@to_dict
+def process_deployment_data(data, chain_type):
+    chain_id = [
+        info for info in CHAIN_DATA.keys() if CHAIN_DATA[info][0] == chain_type
+    ][0]
+    if "address" in data:
+        yield "address", f"<a href='https://{CHAIN_DATA[chain_id][2]}/address/{data['address']}' target='_blank'>{data['address']}</a>"
+    if "block" in data:
+        yield "block", f"<a href='https://{CHAIN_DATA[chain_id][2]}/block/{data['block']}' target='_blank'>{data['block']}</a>"
+    if "transaction" in data:
+        yield "transaction", f"<a href='https://{CHAIN_DATA[chain_id][2]}/tx/{data['transaction']}' target='_blank'>{data['transaction']}</a>"
+    if "contract_type" in data:
+        yield "contract_type", data["contract_type"]
+    if "runtime_bytecode" in data:
+        yield "runtime_bytecode", data["runtime_bytecode"]
+
+
 @to_tuple
-def process_deployment(dep):
+def process_deployment(dep, chain_type=None):
     name, data = dep
     yield name
-    yield json.dumps(data, indent=4, sort_keys=True)
+    if chain_type:
+        yield json.dumps(
+            process_deployment_data(data, chain_type), indent=4, sort_keys=True
+        )
+    else:
+        yield json.dumps(data, indent=4, sort_keys=True)
 
 
 def contract_types_to_table(types):
     type_data = [process_type(ct) for ct in types.items()]
-    type_html = [f"<li>{html[0]}{html[1]}</li>" for html in type_data]
+    type_html = [
+        f"<dl class='row' style='font-size:0.9em'>{html[0]}{html[1]}</dl>"
+        for html in type_data
+    ]
     return "".join(type_html)
 
 
@@ -228,31 +263,37 @@ def contract_types_to_table(types):
 def process_type(ct):
     name, data = ct
     safe_id = name.translate({ord(c): None for c in "./-"})
-    yield f"<h4>{name} <i class='info far fa-eye' id='{safe_id}' style='cursor:pointer;color:black;float:right;'></i></h4"
-    json_data = json.dumps(data, indent=4, sort_keys=True)
-    yield f"<h4><pre class='source_contract' id='{safe_id}'>{json_data}</pre></h4>"
+    yield f"<dt class='col-sm-6 text'><span>{name}</span></dt><dd class='col-sm-6'><i class='info far fa-eye' id='{safe_id}' style='cursor:pointer;color:black;'></i></dd>"
+    json_data = json.dumps(data)
+    yield f"<dd class='col-sm-12'><pre class='source_contract contract_type' id='{safe_id}'>{escape_angles(json_data)}</pre></dd>"
 
 
 def links_to_table(links):
     data_html = [gen_link_html(link) for link in links.items()]
-    html_list = [f"<li><h4>{html[0]}: {html[1]}</h4></li>" for html in data_html]
+    html_list = [
+        f"<dl class='row' style='font-size:0.9em'>{html[0]}{html[1]}</dl>"
+        for html in data_html
+    ]
     return "".join(html_list)
 
 
 @to_tuple
 def gen_link_html(data):
     name, uri = data
-    yield name
+    yield f"<dt class='col-sm-3'>{name}</dt>"
     if is_ipfs_uri(uri):
         link = generate_hyperlink(uri)
-        yield f"<a href='{link}' target='_blank'>{uri}</a>"
+        yield f"<dd class='col-sm-9'><span><a href='{link}' target='_blank'>{uri}</a></span></dd>"
     else:
-        yield f"<a href='{uri}' target='_blank'>{uri}</a>"
+        yield f"<dd class='col-sm-9'><span><a href='{uri}' target='_blank'>{uri}</a></span></dd>"
 
 
 def simple_dict_to_table(data):
     data_html = [gen_data_html(item) for item in data.items()]
-    html_list = [f"<li>{html[0]}{html[1]}</li>" for html in data_html]
+    html_list = [
+        f"<dl class='row' style='font-size:0.9em'>{html[0]}{html[1]}</dl>"
+        for html in data_html
+    ]
     return "".join(html_list)
 
 
@@ -260,10 +301,10 @@ def simple_dict_to_table(data):
 def gen_data_html(data):
     name, uri = data
     if is_ipfs_uri(uri):
-        yield f"<h4>{name}: "
+        yield f"<dd class='col-sm-3 text'><span>{name}</span></dt>"
         link = generate_hyperlink(uri)
-        yield f"<a href='{link}' target='_blank'>{uri}</a></h4>"
+        yield f"<dd class='col-sm-9 text'><span><a href='{link}' target='_blank'>{uri}</a></span></dd>"
     else:
         safe_id = name.translate({ord(c): None for c in "./-"})
-        yield f"<h4>{name} <i class='info far fa-eye' id='{safe_id}' style='cursor:pointer;color:black;float:right;'></i></h4"
-        yield f"<h4><pre class='source_contract' id='{safe_id}'>{uri}</pre></h4>"
+        yield f"<dt class='col-sm-6'>{name}</dt><dd class='col-sm-6'><i class='info far fa-eye' id='{safe_id}' style='cursor:pointer;color:black;'></i></dd>"
+        yield f"<dd class='col-sm-12'><pre class='source_contract' id='{safe_id}'><code>{escape_angles(uri)}</code></pre></dd>"
