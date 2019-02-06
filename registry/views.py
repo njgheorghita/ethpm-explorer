@@ -1,5 +1,7 @@
+import csv
 import json
-from django.http import HttpResponse
+from pathlib import Path
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template import loader
 
@@ -20,16 +22,15 @@ from django.views.decorators.csrf import csrf_protect
 from .models import Registry, get_package_versions, Manifest
 from .constants import CHAIN_DATA
 
+DIRECTORY_STORE_PATH = Path(__file__).parent / "directory_store.json"
 
-# still need to test things
-# todo test with non-checksummed
-# better handling of bad returns (b'')/ wrong txs
 
-# todo: later
-# async ipfs search
-# prepare for infura webpoint deprecation
-# ens reverse lookup on registry owner
-# preview github c-a uri manifests
+# todo:
+# Manifest validation in preview
+# Async ipfs search
+# Prepare for infura webpoint deprecation
+# ENS reverse lookup on registry owner
+# Preview github c-a uri manifests
 
 
 @csrf_protect
@@ -46,31 +47,53 @@ def get_package_data(request):
 
 def construct_html(releases_data):
     html_data = [generate_release_html(rls) for rls in releases_data]
-    li_data = [f"<li>{rls[0]}{rls[1]}</li>" for rls in html_data]
-    return "".join(li_data)
+    li_data = [f"{rls[0]}" for rls in html_data]
+    version_data = "".join(li_data)
+    return f"<dl class='row' style='font-size:.8em;'><dt class='col-sm-3' style='text-decoration:underline;'>Version</dt><dt class='col-sm-9' style='text-decoration:underline;'>Manifest URI</dt>{version_data}</dl>"
 
 
 @to_tuple
 def generate_release_html(rls):
-    yield f"<h5 class='version_list'>Version: <span style='font-weight:900;'>{rls.version}</span></h5>"
     if rls.hyperlink:
         ipfs_hash = rls.hyperlink.split("/")[-1]
         yield f"""
-            <h5 class='version_list'>Manifest URI: 
-                <span style='font-weight:900;'>{rls.manifest_uri}</span>
-            </h5>
-            <a href='manifest/{ipfs_hash}' target='_blank' style="font-size:1.3em;margin-top:-50px;float:right;">preview</a>
+            <dd class="col-sm-3">{rls.version}</dd>
+            <dd class="col-sm-7 text"><span>{rls.manifest_uri}</span></dd>
+            <dd class="col-sm-2"><a href='/manifest/{ipfs_hash}' target='_blank' style="float:right;">Details</a></dd>
             """
     else:
-        yield f"<h5 class='version_list'>Manifest URI: <span style='font-weight:900;'>{rls.manifest_uri}</span></h5>"
+        yield f"<dd class='col-sm-3'>{rls.version}</dd><dd class='col-sm-9'>{rls.manifest_uri}</dd>"
+
+
+def directory(request):
+    registries = json.loads(DIRECTORY_STORE_PATH.read_text())
+    template = loader.get_template("registry/directory.html")
+    context = {"registries": registries}
+    return HttpResponse(template.render(context, request))
 
 
 def index(request):
     template = loader.get_template("registry/index.html")
-    if request.method == "POST":
-        context = generate_context_for_post(request.POST)
+    if request.POST:
+        chain_id = request.POST.get("chain_id")
+        chain_name = CHAIN_DATA[chain_id][0]
+        return HttpResponseRedirect(f"/browse/{chain_name}")
+        # context = generate_context_for_index(request.POST.get("chain_id"))
     else:
-        context = generate_context_for_get()
+        context = generate_context_for_index(None)
+    return HttpResponse(template.render(context, request))
+
+
+def find_registry(request, chain_name):
+    registry_addr = request.POST.get("registry_addr")
+    if registry_addr:
+        return HttpResponseRedirect(f"/browse/{chain_name}/{registry_addr}")
+    return browse(request, chain_name, registry_addr)
+
+
+def browse(request, chain_name, registry_addr):
+    template = loader.get_template("registry/index.html")
+    context = generate_context_for_post(chain_name, registry_addr)
     return HttpResponse(template.render(context, request))
 
 
@@ -95,28 +118,33 @@ def manifest(request, manifest_uri):
 
 
 @to_dict
-def generate_context_for_post(request):
+def generate_context_for_post(chain_name, registry_addr):
     # Validate address
-    address = request.get("registry_addr")
-    chain_id = request.get("chain_id")
+    chain_lookup = [
+        cid for cid in CHAIN_DATA.keys() if CHAIN_DATA[cid][0] == chain_name
+    ]
+    if len(chain_lookup) is not 1:
+        raise Exception("go to 404")
+    chain_id = chain_lookup[0]
     w3 = get_w3(chain_id)
     yield "chain_id", chain_id
     if chain_id == "1":
         ens = ENS(w3.provider)
     yield "chain_name", CHAIN_DATA[chain_id][0]
     yield "connection_info", get_connection_info(w3)
-    if is_address(address):
-        yield "active_registry", Registry(to_checksum_address(address), w3)
-    elif chain_id == "1" and address and ens.address(address):
-        yield "active_registry", Registry(address, w3)
+    if is_address(registry_addr):
+        yield "active_registry", Registry(to_checksum_address(registry_addr), w3)
+    elif chain_id == "1" and registry_addr and ens.address(registry_addr):
+        yield "active_registry", Registry(registry_addr, w3)
     else:
         yield "active_registry", None
 
 
 @to_dict
-def generate_context_for_get():
+def generate_context_for_index(chain_id):
     # defaults to ropsten
-    chain_id = "3"
+    if not chain_id:
+        chain_id = "3"
     w3 = get_w3(chain_id)
     yield "chain_id", chain_id
     yield "chain_name", CHAIN_DATA[chain_id][0]
