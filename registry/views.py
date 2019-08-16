@@ -2,20 +2,19 @@ import csv
 import json
 from pathlib import Path
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
 from django.template import loader
 
+from ens import ENS
 from ethpm.constants import IPFS_GATEWAY_PREFIX
-from ethpm.utils.ipfs import extract_ipfs_path_from_uri, create_ipfs_uri
-from ethpm.exceptions import ValidationError
-from eth_utils import is_address, to_checksum_address, to_dict, to_tuple
+from ethpm._utils.ipfs import create_ipfs_uri
+from ethpm.exceptions import EthPMValidationError
+from eth_utils import is_address, to_checksum_address, to_dict, to_tuple, humanize_ipfs_uri
 from web3.auto.infura import w3 as mainnet_w3
 from web3.auto.infura.ropsten import w3 as ropsten_w3_auto
 from web3.pm import PM
 from web3 import Web3
 from web3.providers.auto import load_provider_from_uri
 from web3.middleware import construct_sign_and_send_raw_middleware
-from ens import ENS
 
 from django.views.decorators.csrf import csrf_protect
 
@@ -58,7 +57,7 @@ def generate_release_html(rls):
         ipfs_hash = rls.hyperlink.split("/")[-1]
         yield f"""
             <dd class="col-sm-3">{rls.version}</dd>
-            <dd class="col-sm-7 text"><span>{rls.manifest_uri}</span></dd>
+            <dd class="col-sm-7 text"><span>{humanize_ipfs_uri(rls.manifest_uri)}</span></dd>
             <dd class="col-sm-2"><a href='/manifest/{ipfs_hash}' target='_blank' style="float:right;">Details</a></dd>
             """
     else:
