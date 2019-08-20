@@ -1,4 +1,5 @@
-django==2.2.2
+django==2.2.4
+eth_utils==1.6.4
 web3==5.0.1
 psycopg2==2.7.1
 gunicorn==19.9.0
