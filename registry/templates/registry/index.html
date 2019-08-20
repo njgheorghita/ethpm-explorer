@@ -56,7 +56,7 @@
 		</div>
 	</div>
 	<div class="h-100 row justify-content-center">
-		<a href="/" style="font-size:105%;text-decoration:none;"><h1>EthPM Registry Explorer</h1></a>
+		<a href="/" style="font-size:105%;text-decoration:none;"><h1>ethPM Registry Explorer</h1></a>
 	</div>
 	<div style="float:right;margin-top:-70px;margin-right:15px;">
 		<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
@@ -69,7 +69,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title" id="exampleModalLabel" style='font-weight:900;'>The first rule of EthPM.</h1>
+        <h1 class="modal-title" id="exampleModalLabel" style='font-weight:900;'>The first rule of ethPM.</h1>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -89,7 +89,7 @@
 		<br>
 		<h4 style='font-weight:900;'> Please, practice safe package management.</h4>
 		<br>
-		<p> Don't know where to start? Head over to the <a href="/directory">EthPM Directory</a>. </p>
+		<p> Don't know where to start? Head over to the <a href="https://ethpm.gitbook.io/ethpm/public-registry-directory" target="_blank">ethPM Public Registry Directory</a>. </p>
 		<p> Check out <a href="https://www.ethpm.com/" target="_blank">ethpm.com</a> for more resources.</p>
 	</div>
       <div class="modal-footer">
@@ -118,7 +118,7 @@
 				<span> {{active_registry.ens_domain}} @ </span>
 			{% endif %}
 			<a href="{{ active_registry.registry_link }}" class="address" target="_blank">
-				{{ active_registry.address }}
+				{{ active_registry.humanized_addr }}
 			</a>
 		</dd>
 		<dt class="col-sm-3">Registry Owner</dt>

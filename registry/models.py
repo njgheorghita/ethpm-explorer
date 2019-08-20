@@ -2,23 +2,23 @@ from django.db import models
 from django.forms import ModelForm
 from typing import Any, Dict
 import json
-from eth_utils import to_tuple, to_dict
 
+from eth_utils import to_tuple, to_dict
+from eth_utils import to_canonical_address, to_text
+from ens import ENS
+from ethpm._utils.chains import parse_BIP122_uri
+from ethpm._utils.ipfs import is_ipfs_uri, extract_ipfs_path_from_uri, create_ipfs_uri
 from ethpm.constants import IPFS_GATEWAY_PREFIX
-from ethpm.utils.backend import resolve_uri_contents
-from ethpm.utils.chains import parse_BIP122_uri
-from ethpm.utils.ipfs import is_ipfs_uri, extract_ipfs_path_from_uri, create_ipfs_uri
-from ethpm.utils.manifest_validation import (
+from ethpm.uri import resolve_uri_contents
+from ethpm.validation.manifest import (
     validate_raw_manifest_format,
     validate_manifest_against_schema,
 )
-from ethpm.validation import validate_address
-from eth_utils import to_canonical_address, to_text
-from ens import ENS
-from web3.pm import PM, SolidityReferenceRegistry
+from web3._utils.validation import validate_address
 from web3.exceptions import BadFunctionCallOutput
 
 from .constants import CHAIN_DATA
+from .utils import humanize_address
 
 
 def get_package_versions(registry_address, w3, package_name):
@@ -37,6 +37,7 @@ class Registry(models.Model):
     package_count = models.IntegerField()
     owner = models.CharField(max_length=200, null=True)
     address = models.CharField(max_length=200, null=True)
+    humanized_addr = models.CharField(max_length=200, null=True)
     ens_domain = models.CharField(max_length=200, null=True)
     owner_link = models.CharField(max_length=200, null=True)
     registry_link = models.CharField(max_length=200, null=True)
@@ -47,46 +48,42 @@ class Registry(models.Model):
         ens = ENS(self.w3.provider)
         if chain_id == "1" and ens.address(address):
             self.address = ens.address(address)
+            self.humanized_addr = humanize_address(self.address)
             self.ens_domain = address
         else:
             validate_address(to_canonical_address(address))
             self.address = address
+            self.humanized_addr = humanize_address(self.address)
             self.ens_domain = None
 
         w3.pm.set_registry(self.address)
         try:
-            # implementation agnostic
-            self.owner = w3.pm.registry.owner()
+            # no owner is required for a valid ERC1319 registry
+            try:
+                owner_addr = w3.pm.registry.registry.functions.owner().call()
+                self.owner = humanize_address(owner_addr)
+                self.owner_link = get_etherscan_link(chain_id, owner_addr)
+            except BadFunctionCallOutput:
+                self.owner = "0x"
             self.package_count = w3.pm.get_package_count()
             self.registry_link = get_etherscan_link(chain_id, self.address)
-            self.owner_link = get_etherscan_link(chain_id, self.owner)
         except BadFunctionCallOutput:
             self.owner = gen_invalid_registry_address(address, chain_id)
             self.owner_link = None
             self.registry_link = get_etherscan_link(chain_id, self.address)
             self.package_count = 0
         else:
-            # assert package_count > 0 ???
             try:
                 package_names = w3.pm.get_all_package_names()
                 self.packages = [
                     Package(name, w3.pm.get_release_count(name))
                     for name in package_names
                 ]
-            except BadFunctionCallOutput:
-                try:
-                    sol_registry = SolidityReferenceRegistry(self.address, self.w3)
-                    self.w3.pm.registry = sol_registry
-                    package_names = w3.pm.get_all_package_names()
-                    self.packages = [
-                        Package(name, w3.pm.get_release_count(name))
-                        for name in package_names
-                    ]
-                except BadFunctionCallOutput:
-                    self.owner = gen_invalid_registry_address(address, chain_id)
-                    self.owner_link = None
-                    self.registry_link = None
-                    self.package_count = 0
+            except BadFunctionCallOutput:	
+                self.owner = gen_invalid_registry_address(address, chain_id)	
+                self.owner_link = None	
+                self.registry_link = None	
+                self.package_count = 0
 
     def get_package_versions(self, package_name):
         versions_data = self.w3.pm.get_all_package_releases(package_name)
