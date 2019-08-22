@@ -1,6 +1,6 @@
 django==2.2.4
 eth_utils==1.6.4
-web3==5.0.1
+web3==5.0.2
 psycopg2==2.7.1
 gunicorn==19.9.0
 rollbar
