@@ -220,13 +220,13 @@ def generate_context_for_index(chain_id):
     yield "active_registry", None
     yield "registry_data", grab_default_registry_data(default_registries)
 
-Registry = namedtuple('Registry', ['address', 'count', 'packages'])
+DisplayRegistry = namedtuple('DisplayRegistry', ['address', 'count', 'packages'])
 
 
 @to_tuple
 def grab_default_registry_data(registries):
     for registry, data in registries.items():
-        yield Registry(registry, data['package_count'], data['packages'])
+        yield DisplayRegistry(registry, data['package_count'], data['packages'])
 
 
 def get_w3(chain_id: str):
