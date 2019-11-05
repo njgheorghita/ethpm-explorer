@@ -1,3 +1,4 @@
+from collections import namedtuple
 import csv
 import json
 from pathlib import Path
@@ -72,15 +73,15 @@ def directory(request):
 
 
 def index(request):
-    template = loader.get_template("registry/index.html")
     if request.POST:
+        template = loader.get_template("registry/index.html")
         chain_id = request.POST.get("chain_id")
         chain_name = CHAIN_DATA[chain_id][0]
         return HttpResponseRedirect(f"/browse/{chain_name}")
-        # context = generate_context_for_index(request.POST.get("chain_id"))
     else:
+        template = loader.get_template("registry/landing.html")
         context = generate_context_for_index(None)
-    return HttpResponse(template.render(context, request))
+        return HttpResponse(template.render(context, request))
 
 
 def find_registry(request, chain_name):
@@ -139,16 +140,93 @@ def generate_context_for_post(chain_name, registry_addr):
         yield "active_registry", None
 
 
+# package data hardcoded here to avoid all the w3 calls
+default_registries = {
+    "defi.snakecharmers.eth": {
+        "package_count": 3,
+        "packages": [
+            "compound",
+            "dydx",
+            "moloch-dao",
+        ]
+    },
+    "erc20.snakecharmers.eth": {
+        "package_count": 20,
+        "packages": [
+            "dai-dai",
+            "brave-bat",
+            "usdcoin-usdc-dai",
+        ]
+    },
+    "dappsys.snakecharmers.eth":{
+        "package_count": 15,
+        "packages": [
+            "ds-math",
+            "ds-token",
+            "ds-vault",
+        ]
+    },
+    "erc721.snakecharmers.eth": {
+        "package_count": 20,
+        "packages": [
+            "cryptokitties-ck",
+            "decentraland-land",
+            "godsunchained-gods",
+        ]
+    },
+    "zeppelin.snakecharmers.eth":{
+        "package_count": 15,
+        "packages": [
+            "cryptography",
+            "ownership",
+            "payment",
+        ]
+    },
+    "maker.snakecharmers.eth":{
+        "package_count": 12,
+        "packages": [
+            "flopper",
+            "maker-otc",
+            "sai",
+        ]
+    },
+    "ens.snakecharmers.eth": {
+        "package_count": 3,
+        "packages": [
+            "ens",
+            "ethregistrar",
+            "resolvers",
+        ]
+    },
+    "multisig.snakecharmers.eth": {
+        "package_count": 1,
+        "packages": [
+            "gnosis",
+        ]
+    },
+}
+
+
+
 @to_dict
 def generate_context_for_index(chain_id):
-    # defaults to ropsten
+    # defaults to mainnet
     if not chain_id:
-        chain_id = "3"
+        chain_id = "1"
     w3 = get_w3(chain_id)
     yield "chain_id", chain_id
     yield "chain_name", CHAIN_DATA[chain_id][0]
     yield "connection_info", get_connection_info(w3)
     yield "active_registry", None
+    yield "registry_data", grab_default_registry_data(default_registries)
+
+Registry = namedtuple('Registry', ['address', 'count', 'packages'])
+
+
+@to_tuple
+def grab_default_registry_data(registries):
+    for registry, data in registries.items():
+        yield Registry(registry, data['package_count'], data['packages'])
 
 
 def get_w3(chain_id: str):
