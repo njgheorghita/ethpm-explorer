@@ -17,6 +17,12 @@ body {
 	padding: 10px;
 }
 
+.registry_display {
+	border: 3px solid lightgreen;
+	border-radius: 3px;
+	margin: 10px;
+}
+
 .links > * {
 	margin: 0 10px;
 }
