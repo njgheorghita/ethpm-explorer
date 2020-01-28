@@ -43,6 +43,7 @@ class Registry(models.Model):
     registry_link = models.CharField(max_length=200, null=True)
 
     def __init__(self, address, w3):
+        super().__init__()
         self.w3 = w3
         chain_id = self.w3.net.version
         ens = ENS(self.w3.provider)
