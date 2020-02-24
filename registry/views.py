@@ -49,7 +49,7 @@ def construct_html(releases_data):
     html_data = [generate_release_html(rls) for rls in releases_data]
     li_data = [f"{rls[0]}" for rls in html_data]
     version_data = "".join(li_data)
-    return f"<dl class='row' style='font-size:.8em;'><dt class='col-sm-3' style='text-decoration:underline;'>Version</dt><dt class='col-sm-9' style='text-decoration:underline;'>Manifest URI</dt>{version_data}</dl>"
+    return f"<dl class='row' style='font-size:.8em;'><dt class='col-sm-2' style='text-decoration:underline;'>Version</dt><dt class='col-sm-10' style='text-decoration:underline;'>Manifest URI</dt>{version_data}</dl>"
 
 
 @to_tuple
@@ -57,8 +57,9 @@ def generate_release_html(rls):
     if rls.hyperlink:
         ipfs_hash = rls.hyperlink.split("/")[-1]
         yield f"""
-            <dd class="col-sm-3">{rls.version}</dd>
-            <dd class="col-sm-7 text"><span>{humanize_ipfs_uri(rls.manifest_uri)}</span></dd>
+            <dd class="col-sm-2">{rls.version}</dd>
+            <dd class="col-sm-4 text"><span>{humanize_ipfs_uri(rls.manifest_uri)}</span></dd>
+            <dd class="col-sm-4 text" style="padding-bottom:20px;"><span class="btn btn-light" data-clipboard-text="{rls.ethpm_uri}"> Copy ethPM URI to clipboard </span></dd>
             <dd class="col-sm-2"><a href='/manifest/{ipfs_hash}' target='_blank' style="float:right;">Details</a></dd>
             """
     else:

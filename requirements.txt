@@ -1,5 +1,5 @@
 django==2.2.4
-web3==5.4.0
+web3==5.5.1
 gunicorn==19.9.0
 rollbar
 whitenoise
