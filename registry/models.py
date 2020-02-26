@@ -35,6 +35,7 @@ def get_etherscan_link(chain_id, address):
 
 class Registry(models.Model):
     package_count = models.IntegerField()
+    chain_id = models.CharField(max_length=3, null=True)
     owner = models.CharField(max_length=200, null=True)
     address = models.CharField(max_length=200, null=True)
     humanized_addr = models.CharField(max_length=200, null=True)
@@ -45,9 +46,9 @@ class Registry(models.Model):
     def __init__(self, address, w3):
         super().__init__()
         self.w3 = w3
-        chain_id = self.w3.net.version
+        self.chain_id = self.w3.net.version
         ens = ENS(self.w3.provider)
-        if chain_id == "1" and ens.address(address):
+        if self.chain_id == "1" and ens.address(address):
             self.address = ens.address(address)
             self.humanized_addr = humanize_address(self.address)
             self.ens_domain = address
@@ -63,15 +64,15 @@ class Registry(models.Model):
             try:
                 owner_addr = w3.pm.registry.registry.functions.owner().call()
                 self.owner = humanize_address(owner_addr)
-                self.owner_link = get_etherscan_link(chain_id, owner_addr)
+                self.owner_link = get_etherscan_link(self.chain_id, owner_addr)
             except BadFunctionCallOutput:
                 self.owner = "0x"
             self.package_count = w3.pm.get_package_count()
-            self.registry_link = get_etherscan_link(chain_id, self.address)
+            self.registry_link = get_etherscan_link(self.chain_id, self.address)
         except BadFunctionCallOutput:
-            self.owner = gen_invalid_registry_address(address, chain_id)
+            self.owner = gen_invalid_registry_address(address, self.chain_id)
             self.owner_link = None
-            self.registry_link = get_etherscan_link(chain_id, self.address)
+            self.registry_link = get_etherscan_link(self.chain_id, self.address)
             self.package_count = 0
         else:
             try:
@@ -81,14 +82,18 @@ class Registry(models.Model):
                     for name in package_names
                 ]
             except BadFunctionCallOutput:	
-                self.owner = gen_invalid_registry_address(address, chain_id)	
+                self.owner = gen_invalid_registry_address(address, self.chain_id)	
                 self.owner_link = None	
                 self.registry_link = None	
                 self.package_count = 0
 
     def get_package_versions(self, package_name):
         versions_data = self.w3.pm.get_all_package_releases(package_name)
-        releases = [Release(package_name, data[0], data[1]) for data in versions_data]
+        if self.chain_id == "1":
+            ethpm_uri_prefix = f"ethpm://{self.address}/"
+        else:
+            ethpm_uri_prefix = f"ethpm://{self.address}:{self.chain_id}/"
+        releases = [Release(package_name, data[0], data[1], ethpm_uri_prefix) for data in versions_data]
         return releases
 
 
@@ -110,12 +115,18 @@ class Release(models.Model):
     version = models.CharField(max_length=200, null=True)
     manifest_uri = models.CharField(max_length=1000, null=True)
     hyperlink = models.CharField(max_length=500, null=True)
+    ethpm_uri_prefix = models.CharField(max_length=500, null=True)
 
-    def __init__(self, package_name, version, manifest_uri):
+    def __init__(self, package_name, version, manifest_uri, ethpm_uri_prefix):
         self.package_name = package_name
         self.version = version
         self.manifest_uri = manifest_uri
         self.hyperlink = generate_hyperlink(manifest_uri)
+        self.ethpm_uri_prefix = ethpm_uri_prefix
+
+    @property
+    def ethpm_uri(self):
+        return f"{self.ethpm_uri_prefix}{self.package_name}@{self.version}"
 
 
 def generate_hyperlink(manifest_uri):
