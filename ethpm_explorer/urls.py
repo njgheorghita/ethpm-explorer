@@ -21,7 +21,6 @@ from . import settings
 
 urlpatterns = [
     path("", include("registry.urls")),
-    path("get_package_data/", include("registry.urls")),
 ]
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
