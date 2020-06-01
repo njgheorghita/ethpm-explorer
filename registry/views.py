@@ -74,15 +74,9 @@ def directory(request):
 
 
 def index(request):
-    if request.POST:
-        template = loader.get_template("registry/index.html")
-        chain_id = request.POST.get("chain_id")
-        chain_name = CHAIN_DATA[chain_id][0]
-        return HttpResponseRedirect(f"/browse/{chain_name}")
-    else:
-        template = loader.get_template("registry/landing.html")
-        context = generate_context_for_index(None)
-        return HttpResponse(template.render(context, request))
+    template = loader.get_template("registry/landing.html")
+    context = {}
+    return HttpResponse(template.render(context, request))
 
 
 def find_registry(request, chain_name):
